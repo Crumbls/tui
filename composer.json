@@ -1,0 +1,61 @@
+{
+    "name": "crumbls/tui",
+    "description": "A Laravel package for TUI (Terminal User Interface) components with Eloquent-style fluent interfaces",
+    "keywords": ["laravel", "tui", "console", "terminal", "cli", "artisan"],
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Crumbls",
+            "email": "info@crumbls.com"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "illuminate/console": "^11.0|^12.0"
+    },
+    "require-dev": {
+        "pestphp/pest": "^3.0",
+        "pestphp/pest-plugin-laravel": "^3.0",
+        "phpstan/phpstan": "^1.10",
+        "orchestra/testbench": "^9.0|^10.0",
+        "mockery/mockery": "^1.6",
+        "friendsofphp/php-cs-fixer": "^3.34"
+    },
+    "autoload": {
+        "psr-4": {
+            "Crumbls\\Tui\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Crumbls\\Tui\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Crumbls\\Tui\\TuiServiceProvider"
+            ],
+            "aliases": {
+                "Tui": "Crumbls\\Tui\\Facades\\Tui"
+            }
+        }
+    },
+    "scripts": {
+        "analyse": "vendor/bin/phpstan analyse",
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage-html coverage",
+        "format": "vendor/bin/php-cs-fixer fix --allow-risky=yes",
+        "refactor": "vendor/bin/rector process"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

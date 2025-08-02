@@ -1,0 +1,20 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    paths:
+        - src
+
+    level: 5
+
+    ignoreErrors:
+        - '#Call to an undefined method [a-zA-Z0-9\\_]+::widget\(\)#'
+
+    excludePaths:
+        - src/Terminal/*.php
+        - src/Display/*.php  
+        - src/Layout/*.php
+        - src/Color/*.php
+        - src/Cassowary/*.php
+
+    checkMissingIterableValueType: false
