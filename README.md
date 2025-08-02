@@ -2,6 +2,8 @@
 
 A Laravel package for creating Terminal User Interface (TUI) components.
 
+DON'T USE THIS PACKAGE YET!
+
 ## Installation
 
 Install the package via Composer:
@@ -41,28 +43,6 @@ A modern, Laravel-native TUI framework for building interactive terminal apps wi
 - Responsive: Widgets always fit the terminal viewport, adapt to resize
 - Extensible: Easy to create custom widgets and layouts
 - Professional UX: Uses alternate screen buffer, raw mode, and robust rendering
-
-## Example Usage
-```php
-Tui::screen(function ($screen) {
-    $screen->layout('vertical', [
-        Tui::navbar()->tabs(['Home', 'Settings']),
-        $screen->layout('horizontal', [
-            Tui::sidebar()->widget(
-                Tui::list()->items(['Dashboard', 'Users', 'Settings'])
-            ),
-            $screen->layout('vertical', [
-                Tui::block()->title('Main Content')->widget(
-                    Tui::paragraph()->text('This is the main content area.')
-                ),
-                Tui::block()->title('Details')->widget(
-                    Tui::paragraph()->text('More info here...')
-                ),
-            ])->grow(),
-        ]),
-    ]);
-})->waitForInput();
-```
 
 ## Features
 - Alternate screen buffer for clean, non-scrolling TUIs
