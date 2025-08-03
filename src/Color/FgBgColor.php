@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace PhpTui\Tui\Color;
+namespace Crumbls\Tui\Color;
 
 final class FgBgColor
 {

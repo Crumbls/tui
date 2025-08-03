@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace PhpTui\Tui\Layout\Constraint;
+namespace Crumbls\Tui\Layout\Constraint;
 
-use PhpTui\Tui\Layout\Constraint;
+use Crumbls\Tui\Layout\Constraint;
 
 final class LengthConstraint extends Constraint
 {

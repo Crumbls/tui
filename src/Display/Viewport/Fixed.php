@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace PhpTui\Tui\Display\Viewport;
+namespace Crumbls\Tui\Display\Viewport;
 
-use PhpTui\Tui\Display\Area;
-use PhpTui\Tui\Display\Backend;
-use PhpTui\Tui\Display\ClearType;
-use PhpTui\Tui\Display\Viewport;
-use PhpTui\Tui\Position\Position;
+use Crumbls\Tui\Display\Area;
+use Crumbls\Tui\Display\Backend;
+use Crumbls\Tui\Display\ClearType;
+use Crumbls\Tui\Display\Viewport;
+use Crumbls\Tui\Position\Position;
 
 /**
  * Creates a fixed location viewport at the given Area

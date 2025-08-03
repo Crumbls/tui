@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace PhpTui\Tui\Color;
+namespace Crumbls\Tui\Color;
 
-use PhpTui\Tui\Position\FractionalPosition;
+use Crumbls\Tui\Position\FractionalPosition;
 use RuntimeException;
 
 /**

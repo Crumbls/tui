@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace PhpTui\Tui\Display;
+namespace Crumbls\Tui\Display;
 
-use PhpTui\Tui\Position\Position;
-use PhpTui\Tui\Widget\Margin;
+use Crumbls\Tui\Position\Position;
+use Crumbls\Tui\Widget\Margin;
 use RuntimeException;
 use Stringable;
 

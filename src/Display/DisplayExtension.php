@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace PhpTui\Tui\Display;
+namespace Crumbls\Tui\Display;
 
-use PhpTui\Tui\Canvas\ShapePainter;
-use PhpTui\Tui\Widget\WidgetRenderer;
+use Crumbls\Tui\Canvas\ShapePainter;
+use Crumbls\Tui\Widget\WidgetRenderer;
 
 interface DisplayExtension
 {

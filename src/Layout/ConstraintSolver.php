@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace PhpTui\Tui\Layout;
+namespace Crumbls\Tui\Layout;
 
-use PhpTui\Tui\Display\Area;
+use Crumbls\Tui\Display\Area;
 
-use PhpTui\Tui\Display\Areas;
+use Crumbls\Tui\Display\Areas;
 
 interface ConstraintSolver
 {

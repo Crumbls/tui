@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace PhpTui\Tui\Display;
+namespace Crumbls\Tui\Display;
 
 enum ClearType
 {

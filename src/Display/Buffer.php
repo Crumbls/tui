@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace PhpTui\Tui\Display;
+namespace Crumbls\Tui\Display;
 
 use Countable;
 use OutOfBoundsException;
-use PhpTui\Tui\Position\Position;
-use PhpTui\Tui\Style\Style;
-use PhpTui\Tui\Text\Line;
-use PhpTui\Tui\Text\Span;
+use Crumbls\Tui\Position\Position;
+use Crumbls\Tui\Style\Style;
+use Crumbls\Tui\Text\Line;
+use Crumbls\Tui\Text\Span;
 use Stringable;
 
 final class Buffer implements Countable, Stringable

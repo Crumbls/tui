@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace PhpTui\Tui\Display;
+namespace Crumbls\Tui\Display;
 
-use PhpTui\Tui\Color\AnsiColor;
-use PhpTui\Tui\Color\Color;
-use PhpTui\Tui\Style\Modifier;
-use PhpTui\Tui\Style\Style;
+use Crumbls\Tui\Color\AnsiColor;
+use Crumbls\Tui\Color\Color;
+use Crumbls\Tui\Style\Modifier;
+use Crumbls\Tui\Style\Style;
 use Stringable;
 
 final class Cell implements Stringable

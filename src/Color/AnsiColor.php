@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace PhpTui\Tui\Color;
+namespace Crumbls\Tui\Color;
 
 use InvalidArgumentException;
 
-use PhpTui\Tui\Position\FractionalPosition;
+use Crumbls\Tui\Position\FractionalPosition;
 
 /**
  * All colors from the ANSI color table are supported (though some names are not exactly the

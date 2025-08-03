@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace PhpTui\Tui\Display\Backend;
+namespace Crumbls\Tui\Display\Backend;
 
-use PhpTui\Tui\Display\Area;
-use PhpTui\Tui\Display\Backend;
-use PhpTui\Tui\Display\BufferUpdates;
-use PhpTui\Tui\Display\ClearType;
-use PhpTui\Tui\Position\Position;
+use Crumbls\Tui\Display\Area;
+use Crumbls\Tui\Display\Backend;
+use Crumbls\Tui\Display\BufferUpdates;
+use Crumbls\Tui\Display\ClearType;
+use Crumbls\Tui\Position\Position;
 
 final class DummyBackend implements Backend
 {

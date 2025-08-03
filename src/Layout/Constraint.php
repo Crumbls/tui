@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace PhpTui\Tui\Layout;
+namespace Crumbls\Tui\Layout;
 
-use PhpTui\Tui\Layout\Constraint\LengthConstraint;
-use PhpTui\Tui\Layout\Constraint\MaxConstraint;
-use PhpTui\Tui\Layout\Constraint\MinConstraint;
-use PhpTui\Tui\Layout\Constraint\PercentageConstraint;
+use Crumbls\Tui\Layout\Constraint\LengthConstraint;
+use Crumbls\Tui\Layout\Constraint\MaxConstraint;
+use Crumbls\Tui\Layout\Constraint\MinConstraint;
+use Crumbls\Tui\Layout\Constraint\PercentageConstraint;
 use Stringable;
 
 /**

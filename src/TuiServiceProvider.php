@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Crumbls\Tui;
 
+use Crumbls\Tui\Console\Commands\TuiDemoCommand;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -28,10 +29,8 @@ class TuiServiceProvider extends ServiceProvider
     {
 	    if ($this->app->runningInConsole()) {
 		    $this->commands([
-			    \Crumbls\Tui\Console\Commands\TuiDemoCommand::class,
+				TuiDemoCommand::class
 		    ]);
 	    }
-        // When we're ready, we'll add commands and config publishing here
-        // For now, just a clean service provider that does nothing
     }
 }

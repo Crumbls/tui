@@ -4,79 +4,116 @@ declare(strict_types=1);
 
 namespace Crumbls\Tui\Style;
 
-class Style
+use Crumbls\Tui\Color\Color;
+use Crumbls\Tui\Position\FractionalPosition;
+use Stringable;
+
+final class Style implements Stringable, Styleable
 {
-    protected ?string $foreground = null;
-    protected ?string $background = null;
-    protected array $modifiers = [];
+    use StyleableTrait;
 
-    public function __construct(
-        ?string $foreground = null,
-        ?string $background = null,
-        array $modifiers = []
+    private function __construct(
+        public ?Color $fg,
+        public ?Color $bg,
+        public ?Color $underline,
+        public int $addModifiers,
+        public int $subModifiers
     ) {
-        $this->foreground = $foreground;
-        $this->background = $background;
-        $this->modifiers = $modifiers;
     }
 
-    public static function default(): static
+    public function __toString(): string
     {
-        return new static();
+        return sprintf(
+            'Style(fg:%s,bg: %s,u:%s,+mod:%d,-mod:%d)',
+            $this->fg ? $this->fg->debugName() : '-',
+            $this->bg ? $this->bg->debugName() : '-',
+            $this->underline ? $this->underline->debugName() : '-',
+            $this->addModifiers,
+            $this->subModifiers,
+        );
     }
 
-    public static function make(?string $foreground = null, ?string $background = null): static
+    public static function default(): self
     {
-        return new static($foreground, $background);
+        return new self(
+            null,
+            null,
+            null,
+            Modifier::NONE,
+            Modifier::NONE,
+        );
     }
 
-    public function fg(string $color): static
+    public function fg(Color $color): self
     {
-        $this->foreground = $color;
+        $this->fg = $color;
 
         return $this;
     }
 
-    public function bg(string $color): static
+    public function bg(Color $color): self
     {
-        $this->background = $color;
+        $this->bg = $color;
 
         return $this;
     }
 
-    public function bold(): static
+    public function underline(Color $color): self
     {
-        $this->modifiers[] = 'bold';
+        $this->underline = $color;
 
         return $this;
     }
 
-    public function italic(): static
+    /**
+     * Returns a new Style merging the given style with this one.
+     */
+    public function patchStyle(Style $style): self
     {
-        $this->modifiers[] = 'italic';
+        $addModifiers = ($this->addModifiers & ~$style->subModifiers) | $style->addModifiers;
+        $subModifiers = ($this->subModifiers & ~$style->addModifiers) | $style->subModifiers;
+
+        return new self(
+            fg: $style->fg ?? $this->fg,
+            bg: $style->bg ?? $this->bg,
+            underline: $style->underline ?? $this->underline,
+            addModifiers:$addModifiers,
+            subModifiers: $subModifiers,
+        );
+    }
+
+    /**
+     * @param int-mask-of<Modifier::*> $modifier
+     */
+    public function addModifier(int $modifier): self
+    {
+        $this->addModifiers |= $modifier;
 
         return $this;
     }
 
-    public function underline(): static
+    /**
+     * @param int-mask-of<Modifier::*> $modifier
+     */
+    public function removeModifier(int $modifier): self
     {
-        $this->modifiers[] = 'underline';
+        $this->subModifiers |= $modifier;
 
         return $this;
     }
 
-    public function getForeground(): ?string
+    /**
+     * Apply the fractional position to any gradiated colors and return a new
+     * Style.
+     */
+    public function atPosition(FractionalPosition $position): self
     {
-        return $this->foreground;
-    }
-
-    public function getBackground(): ?string
-    {
-        return $this->background;
-    }
-
-    public function getModifiers(): array
-    {
-        return $this->modifiers;
+        return new self(
+            $this->fg?->at($position),
+            $this->bg?->at($position),
+            $this->underline?->at($position),
+            $this->addModifiers,
+            $this->subModifiers
+        );
     }
 }

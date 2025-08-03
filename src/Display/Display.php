@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace PhpTui\Tui\Display;
+namespace Crumbls\Tui\Display;
 
-use PhpTui\Tui\Display\Viewport\Fullscreen;
-use PhpTui\Tui\Display\Viewport\Inline;
-use PhpTui\Tui\Position\Position;
-use PhpTui\Tui\Widget\Widget;
-use PhpTui\Tui\Widget\WidgetRenderer;
-use PhpTui\Tui\Widget\WidgetRenderer\NullWidgetRenderer;
+use Crumbls\Tui\Display\Viewport\Fullscreen;
+use Crumbls\Tui\Display\Viewport\Inline;
+use Crumbls\Tui\Position\Position;
+use Crumbls\Tui\Widget\Widget;
+use Crumbls\Tui\Widget\WidgetRenderer;
+use Crumbls\Tui\Widget\WidgetRenderer\NullWidgetRenderer;
 
 final class Display
 {
