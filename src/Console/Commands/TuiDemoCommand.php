@@ -10,6 +10,7 @@ use Crumbls\Tui\Display\Backend;
 use Crumbls\Tui\Bridge\PhpTerm\PhpTermBackend;
 use Crumbls\Tui\DisplayBuilder;
 use Crumbls\Tui\Extension\Core\Widget\BlockWidget;
+use Crumbls\Tui\Components\Block;
 use Crumbls\Tui\Extension\Core\Widget\GridWidget;
 use Crumbls\Tui\Extension\Core\Widget\ParagraphWidget;
 use Crumbls\Tui\Extension\Core\Widget\TabsWidget;
@@ -40,11 +41,10 @@ use Crumbls\Tui\Text\Text;
 use Crumbls\Tui\Text\Span;
 use Crumbls\Tui\Style\Style;
 use Crumbls\Tui\Color\AnsiColor;
-use PhpTui\Term\Terminal;
-use PhpTui\Term\Actions;
-use PhpTui\Term\ClearType;
+use Crumbls\Tui\Terminal\Terminal;
 use PhpTui\Term\Event\CharKeyEvent;
 use PhpTui\Term\Event\CodedKeyEvent;
+use PhpTui\Term\Event\MouseEvent;
 use PhpTui\Term\KeyCode;
 use PhpTui\Term\KeyModifiers;
 
@@ -54,7 +54,7 @@ class TuiDemoCommand extends Command
     protected $description = 'Modern TUI demo showcasing the layout system and components';
 
     private int $currentTab = 0;
-    private array $tabs = ['Welcome', 'Canvas', 'Images', 'Lists', 'Progress', 'Tables'];
+    private array $tabs = ['Welcome', 'Components', 'Canvas', 'Images', 'Lists', 'Progress', 'Tables'];
     private array $events = [];
     private ListState $listState;
     private array $downloads = [];
@@ -99,36 +99,27 @@ class TuiDemoCommand extends Command
         $this->listState = new ListState(0, 0);
         
         try {
-            $terminal = Terminal::new();
-            $backend = PhpTermBackend::new($terminal);
-            $display = DisplayBuilder::default($backend)->build();
+            $display = DisplayBuilder::default()->build();
+            $terminal = $display->getTerminal();
 
-            // Setup terminal
-            $terminal->execute(Actions::cursorHide());
-            $terminal->execute(Actions::alternateScreenEnable());
-            
-            try {
-                $terminal->enableRawMode();
-                $rawModeEnabled = true;
-            } catch (\Exception $e) {
-                $this->warn('Could not enable raw mode: ' . $e->getMessage());
-                $rawModeEnabled = false;
-            }
+            $rawModeEnabled = true;
 
             // Render once to show the interface
             $display->draw($this->buildLayout());
+
             
             if ($rawModeEnabled) {
                 // Main event loop
                 while (true) {
                     // Handle events
+
                     while (null !== $event = $terminal->events()->next()) {
                         if ($event instanceof CharKeyEvent) {
                             if ($event->modifiers === KeyModifiers::NONE) {
                                 if ($event->char === 'q') {
                                     break 2;
                                 }
-                                if ($event->char >= '1' && $event->char <= '6') {
+                                if ($event->char >= '1' && $event->char <= '7') {
                                     $this->currentTab = intval($event->char) - 1;
                                     $display->draw($this->buildLayout());
                                 }
@@ -153,7 +144,7 @@ class TuiDemoCommand extends Command
                     }
 
                     // Re-render for animation on canvas, images, progress, and tables tabs
-                    if ($this->currentTab === 0 || $this->currentTab === 1 || $this->currentTab === 3 || $this->currentTab === 4) {
+                    if ($this->currentTab === 2 || $this->currentTab === 3 || $this->currentTab === 5 || $this->currentTab === 6) {
 	                    $this->animationFrame++;
 	                    $display->draw($this->buildLayout());
                     }
@@ -188,20 +179,8 @@ class TuiDemoCommand extends Command
             }
         } catch (\Exception $e) {
             $this->error('TUI Demo failed: ' . $e->getMessage());
-        } finally {
-            // Cleanup
-            try {
-                if (isset($terminal)) {
-                    if ($rawModeEnabled ?? false) {
-                        $terminal->disableRawMode();
-                    }
-                    $terminal->execute(Actions::cursorShow());
-                    $terminal->execute(Actions::alternateScreenDisable());
-                }
-            } catch (\Exception $e) {
-                // Ignore cleanup errors
-            }
         }
+        // Terminal cleanup happens automatically via __destruct
 
         $this->info('TUI Demo finished.');
         return 0;
@@ -229,12 +208,13 @@ class TuiDemoCommand extends Command
             ->widget(
                 TabsWidget::fromTitles(
                     Line::parse('<fg=red>Cmd + Q</> to quit'),
-                    Line::fromString('1. Canvas'),
-                    Line::fromString('2. Images'),
-                    Line::fromString('3. Lists'),
-                    Line::fromString('4. Progress'),
-                    Line::fromString('5. Tables'),
-                    Line::fromString('6. Event Log'),
+                    Line::fromString('Welcome'),
+                    Line::fromString('Components'),
+                    Line::fromString('Canvas'),
+                    Line::fromString('Images'),
+                    Line::fromString('Lists'),
+                    Line::fromString('Progress'),
+                    Line::fromString('Tables'),
                 )->select($this->currentTab + 1)
                 ->highlightStyle(Style::default()->white()->onBlue())
             );
@@ -245,13 +225,14 @@ class TuiDemoCommand extends Command
 		if ($this->currentTab) {
 		}
         return match ($this->currentTab) {
-			0 => $this->buildCanvasPage(),
-	        1 => $this->buildImagesPage(),
-	        2 => $this->buildListsPage(),
-	        3 => $this->buildProgressPage(),
-	        4 => $this->buildTablesPage(),
-	        5 => $this->buildWelcomePage(),
-            default => $this->buildCanvasPage(),
+			0 => $this->buildWelcomePage(),
+			1 => $this->buildComponentsPage(),
+	        2 => $this->buildCanvasPage(),
+	        3 => $this->buildImagesPage(),
+	        4 => $this->buildListsPage(),
+	        5 => $this->buildProgressPage(),
+	        6 => $this->buildTablesPage(),
+            default => $this->buildWelcomePage(),
         };
     }
 
@@ -276,10 +257,12 @@ class TuiDemoCommand extends Command
                             Line::fromString('- Press q to quit'),
                             Line::fromString(''),
                             Line::fromString('📋 Featured demos:'),
-                            Line::fromString('- Tab 2: 🎨 Canvas with animated shapes'),
-                            Line::fromString('- Tab 3: Colored list with sample events'),
-                            Line::fromString('- Tab 4: 🚀 Animated progress bars!'),
-                            Line::fromString('- Tab 5: Table widgets (coming soon)'),
+                            Line::fromString('- Tab 2: ⚡ Modern Components (NEW!)'),
+                            Line::fromString('- Tab 3: 🎨 Canvas with animated shapes'),
+                            Line::fromString('- Tab 4: 🖼️ Image rendering'),
+                            Line::fromString('- Tab 5: 📋 Lists and data'),
+                            Line::fromString('- Tab 6: 🚀 Animated progress bars!'),
+                            Line::fromString('- Tab 7: 📊 Tables and data display'),
                         )
                     ),
                 BlockWidget::default()
@@ -289,6 +272,106 @@ class TuiDemoCommand extends Command
                         ParagraphWidget::fromLines(
                             ...array_map(fn($event) => Line::fromString($event), $this->events)
                         )
+                    )
+            );
+    }
+
+    private function buildComponentsPage()
+    {
+        return GridWidget::default()
+            ->direction(Direction::Vertical)
+            ->constraints(
+                Constraint::length(6),
+                Constraint::min(1),
+            )
+            ->widgets(
+                // Header with info
+                BlockWidget::default()
+                    ->titles(Title::fromString('⚡ Modern Component System'))
+                    ->borders(Borders::ALL)
+                    ->style(Style::default()->fg(AnsiColor::Cyan))
+                    ->widget(
+                        ParagraphWidget::fromLines(
+                            Line::fromString('Showcasing our new component architecture with event handling'),
+                            Line::fromString('Components: DOM-like event bubbling, focus management, fluent API'),
+                            Line::fromString('Old vs New: Compare BlockWidget (legacy) vs Block (modern)'),
+                            Line::fromString('Event System: Click handling, keyboard shortcuts, focus states'),
+                        )
+                    ),
+                
+                // Demo grid showing different component styles
+                GridWidget::default()
+                    ->direction(Direction::Horizontal)
+                    ->constraints(
+                        Constraint::percentage(33),
+                        Constraint::percentage(33),
+                        Constraint::percentage(34),
+                    )
+                    ->widgets(
+                        // Legacy BlockWidget example
+                        BlockWidget::default()
+                            ->titles(Title::fromString('Legacy BlockWidget'))
+                            ->borders(Borders::ALL)
+                            ->borderType(\Crumbls\Tui\Widget\BorderType::Plain)
+                            ->style(Style::default()->fg(AnsiColor::Gray))
+                            ->widget(
+                                ParagraphWidget::fromLines(
+                                    Line::fromString('Old way:'),
+                                    Line::fromString(''),
+                                    Line::fromString('BlockWidget::default()'),
+                                    Line::fromString('  ->borders(Borders::ALL)'),
+                                    Line::fromString('  ->titles(...)'),
+                                    Line::fromString('  ->widget(content)'),
+                                    Line::fromString(''),
+                                    Line::fromString('No event handling'),
+                                    Line::fromString('No focus management'),
+                                    Line::fromString('Verbose setup'),
+                                )
+                            ),
+                        
+                        // Modern Block component - we'll need to convert this to work with existing renderer
+                        BlockWidget::default()
+                            ->titles(Title::fromString('Modern Block (Concept)'))
+                            ->borders(Borders::ALL)
+                            ->borderType(\Crumbls\Tui\Widget\BorderType::Rounded)
+                            ->style(Style::default()->fg(AnsiColor::Green))
+                            ->widget(
+                                ParagraphWidget::fromLines(
+                                    Line::fromString('New way:'),
+                                    Line::fromString(''),
+                                    Line::fromString('Block::card()'),
+                                    Line::fromString('  ->title("Hello")'),
+                                    Line::fromString('  ->focusable()'),
+                                    Line::fromString('  ->onClick($handler)'),
+                                    Line::fromString('  ->content($child)'),
+                                    Line::fromString(''),
+                                    Line::fromString('DOM-like events'),
+                                    Line::fromString('Focus management'),
+                                    Line::fromString('Fluent API'),
+                                )
+                            ),
+                        
+                        // Event demo
+                        BlockWidget::default()
+                            ->titles(Title::fromString('Event System'))
+                            ->borders(Borders::ALL)
+                            ->borderType(\Crumbls\Tui\Widget\BorderType::Double)
+                            ->style(Style::default()->fg(AnsiColor::Yellow))
+                            ->widget(
+                                ParagraphWidget::fromLines(
+                                    Line::fromString('Event Features:'),
+                                    Line::fromString(''),
+                                    Line::fromString('• KeyPress: ctrl+a'),
+                                    Line::fromString('• Click: coordinates'),
+                                    Line::fromString('• Focus/Blur states'),
+                                    Line::fromString('• Event bubbling'),
+                                    Line::fromString(''),
+                                    Line::fromString('$component'),
+                                    Line::fromString('  ->onKeyPress($fn)'),
+                                    Line::fromString('  ->onClick($fn)'),
+                                    Line::fromString('  ->focusable()'),
+                                )
+                            ),
                     )
             );
     }
@@ -417,7 +500,7 @@ class TuiDemoCommand extends Command
     private function buildImagesPage()
     {
         return BlockWidget::default()
-            ->titles(Title::fromString('🖼️ Image Demo - Converted to Terminal Graphics'))
+            ->titles(Title::fromString('Image Demo - Converted to Terminal Graphics'))
             ->borders(Borders::ALL)
             ->widget(
                 GridWidget::default()
@@ -432,9 +515,7 @@ class TuiDemoCommand extends Command
                             ->style(Style::default()->fg(AnsiColor::Cyan))
                             ->widget(
                                 ParagraphWidget::fromLines(
-                                    Line::fromString('🖼️ Custom Image to Terminal Graphics Conversion'),
-                                    Line::fromString('Images converted to pixel art using different algorithms'),
-                                    Line::fromString('Frame: ' . $this->animationFrame),
+                                    Line::fromString('Custom Image to Terminal Graphics Conversion'),
                                 )
                             ),
                         // Main canvas with centered Laravel logo (full height)
@@ -648,7 +729,7 @@ class TuiDemoCommand extends Command
                         ...array_map(function ($download) {
                             $ratio = $download['size'] > 0 ? min(1.0, $download['downloaded'] / $download['size']) : 0;
                             $percentage = round($ratio * 100);
-                            $status = $ratio >= 1.0 ? '✅ Complete' : '⬇️ Downloading';
+                            $status = $ratio >= 1.0 ? 'Complete' : 'Downloading';
                             
                             return GridWidget::default()
                                 ->direction(Direction::Horizontal)

@@ -7,7 +7,7 @@
     "authors": [
         {
             "name": "Crumbls",
-            "email": "info@crumbls.com"
+            "email": "tui@Crumbls.com"
         }
     ],
     "require": {
@@ -15,16 +15,18 @@
         "illuminate/console": "^11.0|^12.0"
     },
     "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.34",
+        "larastan/larastan": "^3.6",
+        "mockery/mockery": "^1.6",
         "pestphp/pest": "^3.0",
         "pestphp/pest-plugin-laravel": "^3.0",
-        "phpstan/phpstan": "^1.10",
-        "orchestra/testbench": "^9.0|^10.0",
-        "mockery/mockery": "^1.6",
-        "friendsofphp/php-cs-fixer": "^3.34"
+        "phpstan/phpstan": "^2.1"
     },
     "autoload": {
         "psr-4": {
-            "Crumbls\\Tui\\": "src/"
+            "Crumbls\\Tui\\": "src/",
+            "PhpTui\\Tui\\": "phptui/src/",
+            "PhpTui\\Term\\": "temp/2/src/"
         }
     },
     "autoload-dev": {
