@@ -112,16 +112,24 @@ class Tabs extends Component implements SelectableInterface
             }
         }
 
-        // Handle Tab key for next tab
+        // Handle Tab key for next tab - always cycle through tabs when multiple exist
         if ($key === "\t") {
-            $this->nextTab();
-            return true;
+            $tabCount = count($this->children());
+            if ($tabCount > 1) {
+                $this->nextTab(); // This cycles: (activeTab + 1) % tabCount
+                return true; // Event handled - consume Tab key for tab cycling
+            }
+            return false; // Let tab key bubble for focus navigation when only one tab
         }
 
-        // Handle Shift+Tab for previous tab
+        // Handle Shift+Tab for previous tab (only if there are multiple tabs)
         if ($key === "\033[Z") {
-            $this->previousTab();
-            return true;
+            $tabCount = count($this->children());
+            if ($tabCount > 1) {
+                $this->previousTab();
+                return true; // Event handled
+            }
+            return false; // Let shift+tab key bubble for focus navigation
         }
 
         return false; // Event not handled, let it bubble

@@ -112,22 +112,37 @@ class TuiDemoCommand extends Command
 	protected function createComponentsContent(): Panel  
 	{
 		return Panel::make('Components')
-//			->title('Modern Component Architecture')
 			->noTitle()
 			->with(
 				Row::make()->with(
 					Panel::make('Features')
-						->title('Features')
+						->title('New Focus System')
+						->focusable()
+						->onEnter(function() {
+							$this->info('Features panel gained focus!');
+						})
+						->onLeave(function() {
+							$this->info('Features panel lost focus');
+						})
+						->onActivate(function() {
+							$this->info('Features panel activated!');
+						})
 						->with(
 							Paragraph::make('feature-list')
-								->content('• DOM-like event system • Focus management • Fluent API • Laravel patterns')
+								->content('• onEnter/onLeave events • onActivate (Enter key) • onClick events • Fluent focusable()')
 						),
 					Panel::make('Example')
-						->title('qCode Example')
-						->noBorder()
+						->title('Interactive Example')
+						->focusable()
+						->onEnter(function() {
+							$this->info('Example panel is now focused');
+						})
+						->onActivate(function() {
+							$this->info('Example activated - try Tab/Enter!');
+						})
 						->with(
 							Paragraph::make('code')
-								->content('Block::card()->title("My Card")->focusable()->onClick($handler)')
+								->content('Panel::make()->focusable()->onEnter($fn)->onLeave($fn)->onActivate($fn)')
 						)
 				)
 			);

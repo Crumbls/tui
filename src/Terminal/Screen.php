@@ -2,7 +2,10 @@
 
 namespace Crumbls\Tui\Terminal;
 
-class Screen
+use Crumbls\Tui\Contracts\ScreenContract;
+use Crumbls\Tui\Contracts\TerminalContract;
+
+class Screen implements ScreenContract
 {
     protected array $buffer = [];
     protected array $colorBuffer = [];
@@ -10,10 +13,10 @@ class Screen
     protected array $previousColorBuffer = [];
     protected int $width;
     protected int $height;
-    protected Terminal $terminal;
+    protected TerminalContract $terminal;
     protected bool $firstRender = true;
 
-    public function __construct(Terminal $terminal)
+    public function __construct(TerminalContract $terminal)
     {
         $this->terminal = $terminal;
         $this->width = $terminal->getWidth();

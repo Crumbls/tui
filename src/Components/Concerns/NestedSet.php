@@ -259,9 +259,10 @@ trait NestedSet
     }
 
     /**
-     * Get node height (maximum depth of descendants + 1)
+     * Get the tree height (depth of deepest descendant)
+     * Note: This is different from component display height
      */
-    public function getHeight(): int
+    public function getTreeHeight(): int
     {
         if ($this->isLeaf()) {
             return 1;
@@ -1009,7 +1010,11 @@ trait NestedSet
 		return $this->rgt;
 	}
 
-	public function getWidth() : int {
+	/**
+	 * Get the nested set width (rgt - lft)
+	 * Note: This is different from component display width
+	 */
+	public function getNestedSetWidth(): int {
 		return $this->rgt - $this->lft;
 	}
 }

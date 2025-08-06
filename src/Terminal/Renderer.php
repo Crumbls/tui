@@ -4,17 +4,20 @@ namespace Crumbls\Tui\Terminal;
 
 use Crumbls\Tui\Components\Contracts\Component;
 use Crumbls\Tui\Contracts\InputBusContract;
+use Crumbls\Tui\Contracts\RendererContract;
+use Crumbls\Tui\Contracts\ScreenContract;
+use Crumbls\Tui\Contracts\TerminalContract;
 use Crumbls\Tui\Layout\Layout;
 use Crumbls\Tui\Layout\VerticalLayout;
 
-class Renderer
+class Renderer implements RendererContract
 {
-    protected Terminal $terminal;
-    protected Screen $screen;
+    protected TerminalContract $terminal;
+    protected ScreenContract $screen;
     protected ?Layout $layout = null;
     protected ?InputBusContract $inputBus = null;
 
-    public function __construct(Terminal $terminal = null)
+    public function __construct(TerminalContract $terminal = null)
     {
         $this->terminal = $terminal ?? new Terminal();
         $this->screen = new Screen($this->terminal);

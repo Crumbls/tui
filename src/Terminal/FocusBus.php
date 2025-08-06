@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace Crumbls\Tui\Terminal;
 
+use Crumbls\Tui\Contracts\FocusBusContract;
 use Crumbls\Tui\Contracts\SelectableInterface;
 use Crumbls\Tui\Components\Contracts\Component;
 use Crumbls\Tui\Events\MouseEvent;
+use Crumbls\Tui\Events\FocusEnterEvent;
+use Crumbls\Tui\Events\FocusLeaveEvent;
+use Crumbls\Tui\Events\ActivateEvent;
 
 /**
  * Manages focus and selection across component trees.
  * Ensures events only bubble from the currently focused component up through its parent chain.
  */
-class FocusBus
+class FocusBus implements FocusBusContract
 {
     private ?SelectableInterface $focused = null;
     private array $roots = [];
@@ -409,5 +413,151 @@ class FocusBus
         }
         
         return $components;
+    }
+
+    // =================== ENHANCED COMPONENT FOCUS SYSTEM ===================
+
+    protected ?Component $focusedComponent = null;
+
+    /**
+     * Set focus on a Component (with new event system)
+     */
+    public function setComponentFocus(Component $component): void
+    {
+        if (!$this->enabled || !$component->canFocus()) {
+            return;
+        }
+
+        $previousComponent = $this->focusedComponent;
+
+        // Dispatch leave event to previous component
+        if ($previousComponent && $previousComponent !== $component) {
+            $leaveEvent = new FocusLeaveEvent($previousComponent, $component);
+            $previousComponent->dispatchLeaveEvent($leaveEvent);
+        }
+
+        // Set new focus
+        $this->focusedComponent = $component;
+
+        // Dispatch enter event to new component
+        $enterEvent = new FocusEnterEvent($component, $previousComponent);
+        $component->dispatchEnterEvent($enterEvent);
+    }
+
+    /**
+     * Get the currently focused Component
+     */
+    public function getFocusedComponent(): ?Component
+    {
+        return $this->focusedComponent;
+    }
+
+    /**
+     * Clear component focus
+     */
+    public function clearComponentFocus(): void
+    {
+        if ($this->focusedComponent) {
+            $leaveEvent = new FocusLeaveEvent($this->focusedComponent);
+            $this->focusedComponent->dispatchLeaveEvent($leaveEvent);
+            $this->focusedComponent = null;
+        }
+    }
+
+    /**
+     * Activate the currently focused component (Enter key pressed)
+     */
+    public function activateFocusedComponent(string $trigger = 'enter'): bool
+    {
+        if (!$this->focusedComponent) {
+            return false;
+        }
+
+        $activateEvent = new ActivateEvent($this->focusedComponent, $trigger);
+        return $this->focusedComponent->dispatchActivateEvent($activateEvent);
+    }
+
+    /**
+     * Focus next focusable component
+     */
+    public function focusNextComponent(): bool
+    {
+        $focusableComponents = $this->getFocusableComponents();
+        if (empty($focusableComponents)) {
+            return false;
+        }
+
+        // Find current focus index
+        $currentIndex = -1;
+        if ($this->focusedComponent) {
+            foreach ($focusableComponents as $index => $component) {
+                if ($component->getId() === $this->focusedComponent->getId()) {
+                    $currentIndex = $index;
+                    break;
+                }
+            }
+        }
+
+        // Get next component (with wrap-around)
+        $nextIndex = ($currentIndex + 1) % count($focusableComponents);
+        $this->setComponentFocus($focusableComponents[$nextIndex]);
+
+        return true;
+    }
+
+    /**
+     * Focus previous focusable component
+     */
+    public function focusPreviousComponent(): bool
+    {
+        $focusableComponents = $this->getFocusableComponents();
+        if (empty($focusableComponents)) {
+            return false;
+        }
+
+        // Find current focus index
+        $currentIndex = -1;
+        if ($this->focusedComponent) {
+            foreach ($focusableComponents as $index => $component) {
+                if ($component->getId() === $this->focusedComponent->getId()) {
+                    $currentIndex = $index;
+                    break;
+                }
+            }
+        }
+
+        // Get previous component (with wrap-around)
+        $prevIndex = ($currentIndex - 1 + count($focusableComponents)) % count($focusableComponents);
+        $this->setComponentFocus($focusableComponents[$prevIndex]);
+
+        return true;
+    }
+
+    /**
+     * Get all focusable components from registered roots
+     */
+    public function getFocusableComponents(): array
+    {
+        $focusableComponents = [];
+        
+        foreach ($this->roots as $root) {
+            $this->collectFocusableComponents($root, $focusableComponents);
+        }
+        
+        return $focusableComponents;
+    }
+
+    /**
+     * Recursively collect focusable components
+     */
+    private function collectFocusableComponents(Component $component, array &$components): void
+    {
+        if ($component->canFocus()) {
+            $components[] = $component;
+        }
+
+        foreach ($component->children() as $child) {
+            $this->collectFocusableComponents($child, $components);
+        }
     }
 }

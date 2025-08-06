@@ -168,6 +168,125 @@ abstract class Component implements ComponentContract
 
 //    abstract public function render(): string;
 
+	// =================== FOCUS EVENT HANDLERS ===================
+
+	protected array $onEnter = [];
+	protected array $onLeave = [];
+	protected array $onActivate = [];
+	protected array $onClick = [];
+	protected bool $isFocusable = false;
+
+	/**
+	 * Make component focusable
+	 */
+	public function focusable(bool $focusable = true): self
+	{
+		$this->isFocusable = $focusable;
+		return $this;
+	}
+
+	/**
+	 * Check if component is focusable
+	 */
+	public function canFocus(): bool
+	{
+		return $this->isFocusable;
+	}
+
+	/**
+	 * Register focus enter event handler
+	 */
+	public function onEnter(callable $handler): self
+	{
+		$this->onEnter[] = $handler;
+		return $this;
+	}
+
+	/**
+	 * Register focus leave event handler
+	 */
+	public function onLeave(callable $handler): self
+	{
+		$this->onLeave[] = $handler;
+		return $this;
+	}
+
+	/**
+	 * Register activate event handler (Enter key on focused component)
+	 */
+	public function onActivate(callable $handler): self
+	{
+		$this->onActivate[] = $handler;
+		return $this;
+	}
+
+	/**
+	 * Register click event handler
+	 */
+	public function onClick(callable $handler): self
+	{
+		$this->onClick[] = $handler;
+		return $this;
+	}
+
+	/**
+	 * Dispatch focus enter event to handlers
+	 */
+	public function dispatchEnterEvent(\Crumbls\Tui\Events\FocusEnterEvent $event): bool
+	{
+		foreach ($this->onEnter as $handler) {
+			$result = $handler($event, $this);
+			if ($result === true) {
+				return true; // Event handled
+			}
+		}
+		return false; // Event not handled, continue bubbling
+	}
+
+	/**
+	 * Dispatch focus leave event to handlers
+	 */
+	public function dispatchLeaveEvent(\Crumbls\Tui\Events\FocusLeaveEvent $event): bool
+	{
+		foreach ($this->onLeave as $handler) {
+			$result = $handler($event, $this);
+			if ($result === true) {
+				return true; // Event handled
+			}
+		}
+		return false; // Event not handled, continue bubbling
+	}
+
+	/**
+	 * Dispatch activate event to handlers
+	 */
+	public function dispatchActivateEvent(\Crumbls\Tui\Events\ActivateEvent $event): bool
+	{
+		foreach ($this->onActivate as $handler) {
+			$result = $handler($event, $this);
+			if ($result === true) {
+				return true; // Event handled
+			}
+		}
+		return false; // Event not handled, continue bubbling
+	}
+
+	/**
+	 * Dispatch click event to handlers
+	 */
+	public function dispatchClickEvent(\Crumbls\Tui\Events\MouseEvent $event): bool
+	{
+		foreach ($this->onClick as $handler) {
+			$result = $handler($event, $this);
+			if ($result === true) {
+				return true; // Event handled
+			}
+		}
+		return false; // Event not handled, continue bubbling
+	}
+
+	// =================== RENDERING ===================
+
 	public function render() : string {
 		$padding = str_repeat('-', $this->depth * 2);
 		$ret = [$padding . $this->getTitle().' - '.$this->getDepth().' - '.$this->getId().' - '.$this->parent?->getId()];

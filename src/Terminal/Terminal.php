@@ -2,7 +2,9 @@
 
 namespace Crumbls\Tui\Terminal;
 
-class Terminal
+use Crumbls\Tui\Contracts\TerminalContract;
+
+class Terminal implements TerminalContract
 {
     protected int $width;
     protected int $height;

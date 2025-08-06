@@ -3,6 +3,7 @@
 namespace Crumbls\Tui\Terminal;
 
 use Crumbls\Tui\Components\Contracts\Component;
+use Crumbls\Tui\Contracts\HitTesterContract;
 
 class HitTester
 {

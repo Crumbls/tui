@@ -29,9 +29,37 @@ abstract class Command extends BaseCommand {
 	abstract public function getLayout(): mixed;
 	
 	public function handleKey($key) {
-		// Try focus bus first for proper event bubbling
+		// Try legacy focus bus first (for tabs and other SelectableInterface components)
 		if ($this->getFocusBus()->handleKeyInput($key)) {
 			return; // Event was handled by focused component
+		}
+		
+		// Handle Tab navigation (new component focus system) - only if legacy didn't handle it
+		if ($key === "\t") { // Tab key
+			if ($this->getFocusBus()->focusNextComponent()) {
+				return; // Focus navigation handled
+			}
+		}
+		
+		// Handle Shift+Tab navigation  
+		if ($key === "\033[Z") { // Shift+Tab key
+			if ($this->getFocusBus()->focusPreviousComponent()) {
+				return; // Focus navigation handled
+			}
+		}
+		
+		// Handle Enter key activation
+		if ($key === "\r" || $key === "\n") { // Enter key
+			if ($this->getFocusBus()->activateFocusedComponent('enter')) {
+				return; // Activation handled
+			}
+		}
+		
+		// Handle Space key activation (alternative activation)
+		if ($key === ' ') { // Space key
+			if ($this->getFocusBus()->activateFocusedComponent('space')) {
+				return; // Activation handled
+			}
 		}
 		
 		// Default implementation - subclasses can override for global key handling
