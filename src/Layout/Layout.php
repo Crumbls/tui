@@ -1,59 +1,32 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Crumbls\Tui\Layout;
 
-use Crumbls\Tui\Bridge\Cassowary\CassowaryConstraintSolver;
-use Crumbls\Tui\Display\Area;
-use Crumbls\Tui\Display\Areas;
-use Crumbls\Tui\Widget\Direction;
-use Crumbls\Tui\Widget\Margin;
+use Crumbls\Tui\Components\Contracts\Component;
 
-final class Layout
+abstract class Layout
 {
-    /**
-     * @param Constraint[] $constraints
-     */
-    private function __construct(
-        private readonly ConstraintSolver $solver,
-        public Direction $direction,
-        public Margin $margin,
-        public array $constraints,
-        public bool $expandToFill,
-    ) {
-    }
+    protected int $x = 0;
+    protected int $y = 0;
+    protected int $width = 0;
+    protected int $height = 0;
 
-    public static function default(): self
+    public function __construct(int $x, int $y, int $width, int $height)
     {
-        return new self(
-            new CassowaryConstraintSolver(),
-            Direction::Vertical,
-            Margin::none(),
-            [],
-            true
-        );
-    }
-
-    public function direction(Direction $direction): self
-    {
-        $this->direction = $direction;
-
-        return $this;
+        $this->x = $x;
+        $this->y = $y;
+        $this->width = $width;
+        $this->height = $height;
     }
 
     /**
-     * @param Constraint[] $constraints
+     * Calculate positions for all components
+     * Returns array of [component => ['x' => int, 'y' => int, 'width' => int, 'height' => int]]
      */
-    public function constraints(array $constraints): self
-    {
-        $this->constraints = $constraints;
+    abstract public function calculate(array $components): array;
 
-        return $this;
-    }
-
-    public function split(Area $target): Areas
-    {
-        return $this->solver->solve($this, $target, $this->constraints);
-    }
+    public function getX(): int { return $this->x; }
+    public function getY(): int { return $this->y; }
+    public function getWidth(): int { return $this->width; }
+    public function getHeight(): int { return $this->height; }
 }
